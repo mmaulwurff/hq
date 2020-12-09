@@ -1,0 +1,7 @@
+Alias go_to_hq "netevent go_to_hq"
+Alias go_back_from_hq "netevent go_back_from_hq"
+
+AddKeySection "HQ Keys" "hq_keys"
+
+AddMenuKey "Go to HQ" "go_to_hq"
+AddMenuKey "Go back from HQ" "go_back_from_hq"
