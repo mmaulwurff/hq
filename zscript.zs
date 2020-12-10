@@ -62,17 +62,19 @@ class hq_EventHandler : EventHandler
       positionDict.insert("angle", string.Format("%f", player.angle));
       Cvar.getCvar(POSITION_CVAR).setString(positionDict.toString());
 
-      level.changeLevel(HQ_MAP_NAME, 0, CHANGELEVEL_NOINTERMISSION);
+      level.changeLevel(HQ_MAP_NAME, 0, HQ_CHANGELEVEL_FLAGS);
     }
 
     if (event.name == "go_back_from_hq" && level.mapname ~== HQ_MAP_NAME)
     {
-      level.changeLevel(CVar.GetCvar(BACKMAP_CVAR).getString(), 0, CHANGELEVEL_NOINTERMISSION);
+      level.changeLevel(CVar.GetCvar(BACKMAP_CVAR).getString(), 0, HQ_CHANGELEVEL_FLAGS);
     }
   }
 
   const HQ_MAP_NAME = "test";
   const BACKMAP_CVAR = "hq_backmap";
   const POSITION_CVAR = "hq_position";
+
+  const HQ_CHANGELEVEL_FLAGS = CHANGELEVEL_NOINTERMISSION | CHANGELEVEL_PRERAISEWEAPON;
 
 } // class hq_EventHandler
