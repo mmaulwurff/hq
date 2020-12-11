@@ -14,5 +14,7 @@ map TEST "Modder Test Map"
   next = "TEST"
   secretnext = "MAP31"
   sky1 = "SKY1"
+
   cluster = 5
+  NoAutosaveHint
 }
