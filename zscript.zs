@@ -18,6 +18,13 @@ version "4.5.0"
  * Headquarters.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+class hq_PositionStorage : Actor
+{
+
+  string mPositionString;
+
+} // class hq_PositionStorage
+
 class hq_EventHandler : EventHandler
 {
 
@@ -29,7 +36,7 @@ class hq_EventHandler : EventHandler
     }
     else
     {
-      string positionString = Cvar.getCvar(POSITION_CVAR).getString();
+      string positionString = getPositionString();
       if (positionString.length() != 0)
       {
         Dictionary positionDict = Dictionary.fromString(positionString);
@@ -41,7 +48,7 @@ class hq_EventHandler : EventHandler
         Actor player = players[consolePlayer].mo;
         player.Teleport((x, y, z), angle, TF_USESPOTZ);
 
-        Cvar.getCvar(POSITION_CVAR).setString("");
+        clearPositionString();
       }
 
       CVar.GetCvar(BACKMAP_CVAR).setString(level.mapname);
@@ -60,7 +67,8 @@ class hq_EventHandler : EventHandler
       positionDict.insert("y", string.Format("%f", player.pos.y));
       positionDict.insert("z", string.Format("%f", player.pos.z));
       positionDict.insert("angle", string.Format("%f", player.angle));
-      Cvar.getCvar(POSITION_CVAR).setString(positionDict.toString());
+
+      setPositionString(positionDict.toString());
 
       level.changeLevel(HQ_MAP_NAME, 0, HQ_CHANGELEVEL_FLAGS);
     }
@@ -71,9 +79,50 @@ class hq_EventHandler : EventHandler
     }
   }
 
+// private: ////////////////////////////////////////////////////////////////////////////////////////
+
+  private
+  string getPositionString()
+  {
+    ThinkerIterator i = ThinkerIterator.Create("hq_PositionStorage");
+    hq_PositionStorage positionStorage;
+    while (positionStorage = hq_PositionStorage(i.next()))
+    {
+      return positionStorage.mPositionString;
+    }
+
+    return "";
+  }
+
+  private
+  void clearPositionString()
+  {
+    array<Actor> positionStorages;
+
+    {
+      ThinkerIterator i = ThinkerIterator.Create("hq_PositionStorage");
+      Actor positionStorage;
+      while (positionStorage = Actor(i.next()))
+      {
+        positionStorages.push(positionStorage);
+      }
+    }
+
+    for (uint i = 0; i < positionStorages.size(); ++i)
+    {
+      positionStorages[i].destroy();
+    }
+  }
+
+  private
+  void setPositionString(string positionString)
+  {
+    let positionStorage = hq_PositionStorage(Actor.spawn("hq_PositionStorage"));
+    positionStorage.mPositionString = positionString;
+  }
+
   const HQ_MAP_NAME = "test";
   const BACKMAP_CVAR = "hq_backmap";
-  const POSITION_CVAR = "hq_position";
 
   const HQ_CHANGELEVEL_FLAGS = CHANGELEVEL_NOINTERMISSION | CHANGELEVEL_PRERAISEWEAPON;
 

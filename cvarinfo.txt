@@ -1,2 +1,1 @@
 server string hq_backmap = "";
-server string hq_position = "";
