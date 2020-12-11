@@ -20,10 +20,20 @@ version "4.5.0"
 
 class hq_PositionStorage : Actor
 {
+  string mPosition;
+}
 
-  string mPositionString;
+class hq_BackmapStorage  : Inventory
+{
+  Default
+  {
+    +Inventory.Undroppable;
+    +inventory.Untossable;
+    +inventory.Unclearable;
+  }
 
-} // class hq_PositionStorage
+  string mBackmap;
+}
 
 class hq_EventHandler : EventHandler
 {
@@ -32,7 +42,7 @@ class hq_EventHandler : EventHandler
   {
     if (level.mapname ~== HQ_MAP_NAME)
     {
-      level.nextmap = Cvar.GetCvar(BACKMAP_CVAR).getString();
+      level.nextmap = getBackmap();
     }
     else
     {
@@ -49,9 +59,8 @@ class hq_EventHandler : EventHandler
         player.Teleport((x, y, z), angle, TF_USESPOTZ);
 
         clearPositionString();
+        clearBackmap();
       }
-
-      CVar.GetCvar(BACKMAP_CVAR).setString(level.mapname);
     }
   }
 
@@ -69,13 +78,14 @@ class hq_EventHandler : EventHandler
       positionDict.insert("angle", string.Format("%f", player.angle));
 
       setPositionString(positionDict.toString());
+      setBackmap(level.mapname);
 
       level.changeLevel(HQ_MAP_NAME, 0, HQ_CHANGELEVEL_FLAGS);
     }
 
     if (event.name == "go_back_from_hq" && level.mapname ~== HQ_MAP_NAME)
     {
-      level.changeLevel(CVar.GetCvar(BACKMAP_CVAR).getString(), 0, HQ_CHANGELEVEL_FLAGS);
+      level.changeLevel(getBackmap(), 0, HQ_CHANGELEVEL_FLAGS);
     }
   }
 
@@ -88,7 +98,7 @@ class hq_EventHandler : EventHandler
     hq_PositionStorage positionStorage;
     while (positionStorage = hq_PositionStorage(i.next()))
     {
-      return positionStorage.mPositionString;
+      return positionStorage.mPosition;
     }
 
     return "";
@@ -118,11 +128,33 @@ class hq_EventHandler : EventHandler
   void setPositionString(string positionString)
   {
     let positionStorage = hq_PositionStorage(Actor.spawn("hq_PositionStorage"));
-    positionStorage.mPositionString = positionString;
+    positionStorage.mPosition = positionString;
+  }
+
+  private
+  string getBackmap()
+  {
+    Actor player = players[consolePlayer].mo;
+    let backmapStorage = hq_BackmapStorage(player.findInventory("hq_BackmapStorage"));
+    return backmapStorage.mBackmap;
+  }
+
+  private
+  void setBackmap(string backmap)
+  {
+    Actor player = players[consolePlayer].mo;
+    let backmapStorage = hq_BackmapStorage(player.giveInventoryType("hq_BackmapStorage"));
+    backmapStorage.mBackmap = backmap;
+  }
+
+  private
+  void clearBackmap()
+  {
+    PlayerPawn player = players[consolePlayer].mo;
+    player.removeInventory(player.findInventory("hq_BackmapStorage"));
   }
 
   const HQ_MAP_NAME = "test";
-  const BACKMAP_CVAR = "hq_backmap";
 
   const HQ_CHANGELEVEL_FLAGS = CHANGELEVEL_NOINTERMISSION | CHANGELEVEL_PRERAISEWEAPON;
 
