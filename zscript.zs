@@ -55,8 +55,7 @@ class hq_EventHandler : EventHandler
         double z = positionDict.at("z").toDouble();
         double angle = positionDict.at("angle").toDouble();
 
-        Actor player = players[consolePlayer].mo;
-        player.Teleport((x, y, z), angle, TF_USESPOTZ);
+        player().Teleport((x, y, z), angle, TF_USESPOTZ);
 
         clearPositionString();
         clearBackmap();
@@ -70,7 +69,7 @@ class hq_EventHandler : EventHandler
     {
       if (level.mapname ~== HQ_MAP_NAME) return;
 
-      Actor player = players[consolePlayer].mo;
+      Actor player = player();
       Dictionary positionDict = Dictionary.Create();
       positionDict.insert("x", string.Format("%f", player.pos.x));
       positionDict.insert("y", string.Format("%f", player.pos.y));
@@ -107,20 +106,11 @@ class hq_EventHandler : EventHandler
   private
   void clearPositionString()
   {
-    array<Actor> positionStorages;
-
+    ThinkerIterator i = ThinkerIterator.Create("hq_PositionStorage");
+    Actor positionStorage;
+    while (positionStorage = Actor(i.next()))
     {
-      ThinkerIterator i = ThinkerIterator.Create("hq_PositionStorage");
-      Actor positionStorage;
-      while (positionStorage = Actor(i.next()))
-      {
-        positionStorages.push(positionStorage);
-      }
-    }
-
-    for (uint i = 0; i < positionStorages.size(); ++i)
-    {
-      positionStorages[i].destroy();
+      positionStorage.destroy();
     }
   }
 
@@ -134,24 +124,27 @@ class hq_EventHandler : EventHandler
   private
   string getBackmap()
   {
-    Actor player = players[consolePlayer].mo;
-    let backmapStorage = hq_BackmapStorage(player.findInventory("hq_BackmapStorage"));
+    let backmapStorage = hq_BackmapStorage(player().findInventory("hq_BackmapStorage"));
     return backmapStorage.mBackmap;
   }
 
   private
   void setBackmap(string backmap)
   {
-    Actor player = players[consolePlayer].mo;
-    let backmapStorage = hq_BackmapStorage(player.giveInventoryType("hq_BackmapStorage"));
+    let backmapStorage = hq_BackmapStorage(player().giveInventoryType("hq_BackmapStorage"));
     backmapStorage.mBackmap = backmap;
   }
 
   private
   void clearBackmap()
   {
-    PlayerPawn player = players[consolePlayer].mo;
-    player.removeInventory(player.findInventory("hq_BackmapStorage"));
+    player().findInventory("hq_BackmapStorage").destroy();
+  }
+
+  private
+  PlayerPawn player() const
+  {
+    return players[consolePlayer].mo;
   }
 
   const HQ_MAP_NAME = "test";
