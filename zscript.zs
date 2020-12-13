@@ -38,7 +38,8 @@ class hq_BackmapStorage  : Inventory
 class hq_EventHandler : EventHandler
 {
 
-  override void worldLoaded(WorldEvent event)
+  override
+  void worldLoaded(WorldEvent event)
   {
     if (level.mapname ~== HQ_MAP_NAME)
     {
@@ -63,7 +64,8 @@ class hq_EventHandler : EventHandler
     }
   }
 
-  override void networkProcess(ConsoleEvent event)
+  override
+  void networkProcess(ConsoleEvent event)
   {
     if (event.name == "go_to_hq")
     {
@@ -90,7 +92,7 @@ class hq_EventHandler : EventHandler
 
 // private: ////////////////////////////////////////////////////////////////////////////////////////
 
-  private
+  private static
   string getPositionString()
   {
     ThinkerIterator i = ThinkerIterator.Create("hq_PositionStorage");
@@ -103,7 +105,7 @@ class hq_EventHandler : EventHandler
     return "";
   }
 
-  private
+  private static
   void clearPositionString()
   {
     ThinkerIterator i = ThinkerIterator.Create("hq_PositionStorage");
@@ -114,35 +116,35 @@ class hq_EventHandler : EventHandler
     }
   }
 
-  private
+  private static
   void setPositionString(string positionString)
   {
     let positionStorage = hq_PositionStorage(Actor.spawn("hq_PositionStorage"));
     positionStorage.mPosition = positionString;
   }
 
-  private
+  private static
   string getBackmap()
   {
     let backmapStorage = hq_BackmapStorage(player().findInventory("hq_BackmapStorage"));
     return backmapStorage.mBackmap;
   }
 
-  private
+  private static
   void setBackmap(string backmap)
   {
     let backmapStorage = hq_BackmapStorage(player().giveInventoryType("hq_BackmapStorage"));
     backmapStorage.mBackmap = backmap;
   }
 
-  private
+  private static
   void clearBackmap()
   {
     player().findInventory("hq_BackmapStorage").destroy();
   }
 
-  private
-  PlayerPawn player() const
+  private static
+  PlayerPawn player()
   {
     return players[consolePlayer].mo;
   }
