@@ -61,7 +61,9 @@ class hq_EventHandler : EventHandler
     }
     else
     {
-      restorePlayerPosition();
+      requestRestorePlayerPosition();
+      clearPositionString();
+      clearBackmap();
     }
   }
 
@@ -77,27 +79,37 @@ class hq_EventHandler : EventHandler
   {
     if      (event.name == "hq_go")   go();
     else if (event.name == "hq_back") back();
+    else
+    {
+      Array<string> parts;
+      event.name.split(parts, "@");
+      if (parts[0] != "hq_restore_position") return;
+
+      restorePlayerPosition(event.player, parts[1]);
+    }
   }
 
 // private: ////////////////////////////////////////////////////////////////////////////////////////
 
   private
-  void restorePlayerPosition()
+  void requestRestorePlayerPosition()
   {
     string positionString = getPositionString();
-    if (positionString.length() != 0)
-    {
-      Dictionary positionDict = Dictionary.fromString(positionString);
-      double x = positionDict.at("x").toDouble();
-      double y = positionDict.at("y").toDouble();
-      double z = positionDict.at("z").toDouble();
-      double angle = positionDict.at("angle").toDouble();
+    if (positionString.length() == 0) return;
 
-      player().Teleport((x, y, z), angle, TF_USESPOTZ);
+    sendNetworkEvent(string.format("hq_restore_position@%s", positionString));
+  }
 
-      clearPositionString();
-      clearBackmap();
-    }
+  void restorePlayerPosition(int playerNumber, string positionString)
+  {
+    let positionDict = Dictionary.fromString(positionString);
+    double x = positionDict.at("x").toDouble();
+    double y = positionDict.at("y").toDouble();
+    double z = positionDict.at("z").toDouble();
+    double angle = positionDict.at("angle").toDouble();
+    Actor player = players[playerNumber].mo;
+
+    player.teleport((x, y, z), angle, TF_USESPOTZ);
   }
 
   private
@@ -107,10 +119,10 @@ class hq_EventHandler : EventHandler
 
     Actor player = player();
     let positionDict = Dictionary.Create();
-    positionDict.insert("x", string.Format("%f", player.pos.x));
-    positionDict.insert("y", string.Format("%f", player.pos.y));
-    positionDict.insert("z", string.Format("%f", player.pos.z));
-    positionDict.insert("angle", string.Format("%f", player.angle));
+    positionDict.insert("x", string.format("%f", player.pos.x));
+    positionDict.insert("y", string.format("%f", player.pos.y));
+    positionDict.insert("z", string.format("%f", player.pos.z));
+    positionDict.insert("angle", string.format("%f", player.angle));
 
     setPositionString(positionDict.toString());
     setBackmap(level.mapname);
@@ -129,7 +141,7 @@ class hq_EventHandler : EventHandler
   private static
   string getPositionString()
   {
-    ThinkerIterator i = ThinkerIterator.Create("hq_PositionStorage");
+    ThinkerIterator i = ThinkerIterator.create("hq_PositionStorage");
     hq_PositionStorage positionStorage;
     while (positionStorage = hq_PositionStorage(i.next()))
     {
@@ -153,28 +165,26 @@ class hq_EventHandler : EventHandler
   private static
   void setPositionString(string positionString)
   {
-    let positionStorage = hq_PositionStorage(Actor.spawn("hq_PositionStorage"));
-    positionStorage.mPosition = positionString;
+    hq_PositionStorage(Actor.spawn("hq_PositionStorage")).mPosition = positionString;
   }
 
   private static
   string getBackmap()
   {
-    let backmapStorage = hq_BackmapStorage(player().findInventory("hq_BackmapStorage"));
-    return backmapStorage.mBackmap;
+    return hq_BackmapStorage(player().findInventory("hq_BackmapStorage")).mBackmap;
   }
 
   private static
   void setBackmap(string backmap)
   {
-    let backmapStorage = hq_BackmapStorage(player().giveInventoryType("hq_BackmapStorage"));
-    backmapStorage.mBackmap = backmap;
+    hq_BackmapStorage(player().giveInventoryType("hq_BackmapStorage")).mBackmap = backmap;
   }
 
   private static
   void clearBackmap()
   {
-    player().findInventory("hq_BackmapStorage").destroy();
+    Actor backmapStorage = player().findInventory("hq_BackmapStorage");
+    if (backmapStorage != NULL) backmapStorage.destroy();
   }
 
   private static
