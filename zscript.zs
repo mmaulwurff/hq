@@ -38,10 +38,38 @@ class hq_BackmapStorage  : Inventory
 class hq_EventHandler : EventHandler
 {
 
+// Public interface ////////////////////////////////////////////////////////////////////////////////
+
+  void goToHq()
+  {
+    if (isHq()) return;
+
+    Actor player = player();
+    Dictionary positionDict = Dictionary.Create();
+    positionDict.insert("x", string.Format("%f", player.pos.x));
+    positionDict.insert("y", string.Format("%f", player.pos.y));
+    positionDict.insert("z", string.Format("%f", player.pos.z));
+    positionDict.insert("angle", string.Format("%f", player.angle));
+
+    setPositionString(positionDict.toString());
+    setBackmap(level.mapname);
+
+    level.changeLevel(HQ_MAP_NAME, 0, HQ_CHANGELEVEL_FLAGS);
+  }
+
+  void goBack()
+  {
+    if (!isHq()) return;
+
+    level.changeLevel(getBackmap(), 0, HQ_CHANGELEVEL_FLAGS);
+  }
+
+// Implementation //////////////////////////////////////////////////////////////////////////////////
+
   override
   void worldLoaded(WorldEvent event)
   {
-    if (level.mapname ~== HQ_MAP_NAME)
+    if (isHq())
     {
       level.nextmap = getBackmap();
     }
@@ -67,27 +95,8 @@ class hq_EventHandler : EventHandler
   override
   void networkProcess(ConsoleEvent event)
   {
-    if (event.name == "go_to_hq")
-    {
-      if (level.mapname ~== HQ_MAP_NAME) return;
-
-      Actor player = player();
-      Dictionary positionDict = Dictionary.Create();
-      positionDict.insert("x", string.Format("%f", player.pos.x));
-      positionDict.insert("y", string.Format("%f", player.pos.y));
-      positionDict.insert("z", string.Format("%f", player.pos.z));
-      positionDict.insert("angle", string.Format("%f", player.angle));
-
-      setPositionString(positionDict.toString());
-      setBackmap(level.mapname);
-
-      level.changeLevel(HQ_MAP_NAME, 0, HQ_CHANGELEVEL_FLAGS);
-    }
-
-    if (event.name == "go_back_from_hq" && level.mapname ~== HQ_MAP_NAME)
-    {
-      level.changeLevel(getBackmap(), 0, HQ_CHANGELEVEL_FLAGS);
-    }
+    if      (event.name == "go_to_hq")        goToHq();
+    else if (event.name == "go_back_from_hq") goBack();
   }
 
 // private: ////////////////////////////////////////////////////////////////////////////////////////
@@ -147,6 +156,12 @@ class hq_EventHandler : EventHandler
   PlayerPawn player()
   {
     return players[consolePlayer].mo;
+  }
+
+  private static
+  bool isHq()
+  {
+    return level.mapname ~== HQ_MAP_NAME;
   }
 
   const HQ_MAP_NAME = "test";
