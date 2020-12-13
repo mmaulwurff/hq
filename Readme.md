@@ -33,6 +33,7 @@ player position and the current map name so player can return back.
   map.
 - making a cluster a hub may result in savefile bloat (all maps in cluster
   become stored in a savefile).
+- doesn't work in LZDoom (see [this bug](https://forum.zdoom.org/viewtopic.php?f=334&t=70925)).
 
 ## API
 
