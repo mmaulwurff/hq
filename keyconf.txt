@@ -1,5 +1,5 @@
-Alias go_to_hq "netevent go_to_hq"
-Alias go_back_from_hq "netevent go_back_from_hq"
+Alias go_to_hq        "event hq_request"
+Alias go_back_from_hq "event hq_request_back"
 
 AddKeySection "HQ Keys" "hq_keys"
 

@@ -40,28 +40,16 @@ class hq_EventHandler : EventHandler
 
 // Public interface ////////////////////////////////////////////////////////////////////////////////
 
-  void goToHq()
+  play
+  void request() const
   {
-    if (isHq()) return;
-
-    Actor player = player();
-    Dictionary positionDict = Dictionary.Create();
-    positionDict.insert("x", string.Format("%f", player.pos.x));
-    positionDict.insert("y", string.Format("%f", player.pos.y));
-    positionDict.insert("z", string.Format("%f", player.pos.z));
-    positionDict.insert("angle", string.Format("%f", player.angle));
-
-    setPositionString(positionDict.toString());
-    setBackmap(level.mapname);
-
-    level.changeLevel(HQ_MAP_NAME, 0, HQ_CHANGELEVEL_FLAGS);
+    sendNetworkEvent("hq_go");
   }
 
-  void goBack()
+  play
+  void requestBack() const
   {
-    if (!isHq()) return;
-
-    level.changeLevel(getBackmap(), 0, HQ_CHANGELEVEL_FLAGS);
+    sendNetworkEvent("hq_back");
   }
 
 // Implementation //////////////////////////////////////////////////////////////////////////////////
@@ -75,31 +63,70 @@ class hq_EventHandler : EventHandler
     }
     else
     {
-      string positionString = getPositionString();
-      if (positionString.length() != 0)
-      {
-        Dictionary positionDict = Dictionary.fromString(positionString);
-        double x = positionDict.at("x").toDouble();
-        double y = positionDict.at("y").toDouble();
-        double z = positionDict.at("z").toDouble();
-        double angle = positionDict.at("angle").toDouble();
-
-        player().Teleport((x, y, z), angle, TF_USESPOTZ);
-
-        clearPositionString();
-        clearBackmap();
-      }
+      restorePlayerPosition();
     }
+  }
+
+  override
+  void consoleProcess(ConsoleEvent event)
+  {
+    if      (event.name == "hq_request")      request();
+    else if (event.name == "hq_request_back") requestBack();
   }
 
   override
   void networkProcess(ConsoleEvent event)
   {
-    if      (event.name == "go_to_hq")        goToHq();
-    else if (event.name == "go_back_from_hq") goBack();
+    if      (event.name == "hq_go")   go();
+    else if (event.name == "hq_back") back();
   }
 
 // private: ////////////////////////////////////////////////////////////////////////////////////////
+
+  private
+  void restorePlayerPosition()
+  {
+    string positionString = getPositionString();
+    if (positionString.length() != 0)
+    {
+      Dictionary positionDict = Dictionary.fromString(positionString);
+      double x = positionDict.at("x").toDouble();
+      double y = positionDict.at("y").toDouble();
+      double z = positionDict.at("z").toDouble();
+      double angle = positionDict.at("angle").toDouble();
+
+      player().Teleport((x, y, z), angle, TF_USESPOTZ);
+
+      clearPositionString();
+      clearBackmap();
+    }
+  }
+
+  private
+  void go()
+  {
+    if (isHq()) return;
+
+    Actor player = player();
+    let positionDict = Dictionary.Create();
+    positionDict.insert("x", string.Format("%f", player.pos.x));
+    positionDict.insert("y", string.Format("%f", player.pos.y));
+    positionDict.insert("z", string.Format("%f", player.pos.z));
+    positionDict.insert("angle", string.Format("%f", player.angle));
+
+    setPositionString(positionDict.toString());
+    setBackmap(level.mapname);
+
+    level.changeLevel(HQ_MAP_NAME, 0, HQ_CHANGELEVEL_FLAGS);
+  }
+
+  private
+  void back()
+  {
+    if (!isHq()) return;
+
+    level.changeLevel(getBackmap(), 0, HQ_CHANGELEVEL_FLAGS);
+  }
 
   private static
   string getPositionString()
