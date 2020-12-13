@@ -16,6 +16,26 @@
  * Headquarters.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+// API /////////////////////////////////////////////////////////////////////////////////////////////
+
+class hq_Api
+{
+  static
+  void request()
+  {
+    EventHandler.sendNetworkEvent("hq_go");
+  }
+
+  static
+  void requestBack()
+  {
+    EventHandler.sendNetworkEvent("hq_back");
+  }
+
+} // hq_Api
+
+// Implementation //////////////////////////////////////////////////////////////////////////////////
+
 class hq_PositionStorage : Actor
 {
   string mPosition;
@@ -36,22 +56,6 @@ class hq_BackmapStorage  : Inventory
 class hq_EventHandler : EventHandler
 {
 
-// Public interface ////////////////////////////////////////////////////////////////////////////////
-
-  play
-  void request() const
-  {
-    sendNetworkEvent("hq_go");
-  }
-
-  play
-  void requestBack() const
-  {
-    sendNetworkEvent("hq_back");
-  }
-
-// Implementation //////////////////////////////////////////////////////////////////////////////////
-
   override
   void worldLoaded(WorldEvent event)
   {
@@ -70,8 +74,8 @@ class hq_EventHandler : EventHandler
   override
   void consoleProcess(ConsoleEvent event)
   {
-    if      (event.name == "hq_request")      request();
-    else if (event.name == "hq_request_back") requestBack();
+    if      (event.name == "hq_request")      hq_Api.request();
+    else if (event.name == "hq_request_back") hq_Api.requestBack();
   }
 
   override
