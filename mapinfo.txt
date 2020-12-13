@@ -3,18 +3,30 @@ gameinfo
   AddEventHandlers = "hq_EventHandler"
 }
 
-cluster 5
-{
-  hub
-  allowintermission
-}
+// Cluster setup ///////////////////////////////////////////////////////////////////////////////////
 
-map TEST "Modder Test Map"
-{
-  next = "TEST"
-  secretnext = "MAP31"
-  sky1 = "SKY1"
+// Doom and Doom 2 have 10 clusters overall.
 
-  cluster = 5
-  NoAutosaveHint
-}
+cluster  1 { hub allowintermission }
+cluster  2 { hub allowintermission }
+cluster  3 { hub allowintermission }
+cluster  4 { hub allowintermission }
+cluster  5 { hub allowintermission }
+cluster  6 { hub allowintermission }
+cluster  7 { hub allowintermission }
+cluster  8 { hub allowintermission }
+cluster  9 { hub allowintermission }
+cluster 10 { hub allowintermission }
+
+// Maps setup //////////////////////////////////////////////////////////////////////////////////////
+
+map hq1  "Headquarters 1"  { next = "hq1"  cluster = 1  NoAutosaveHint }
+map hq2  "Headquarters 2"  { next = "hq2"  cluster = 2  NoAutosaveHint }
+map hq3  "Headquarters 3"  { next = "hq3"  cluster = 3  NoAutosaveHint }
+map hq4  "Headquarters 4"  { next = "hq4"  cluster = 4  NoAutosaveHint }
+map hq5  "Headquarters 5"  { next = "hq5"  cluster = 5  NoAutosaveHint }
+map hq6  "Headquarters 6"  { next = "hq6"  cluster = 6  NoAutosaveHint }
+map hq7  "Headquarters 7"  { next = "hq7"  cluster = 7  NoAutosaveHint }
+map hq8  "Headquarters 8"  { next = "hq8"  cluster = 8  NoAutosaveHint }
+map hq9  "Headquarters 9"  { next = "hq9"  cluster = 9  NoAutosaveHint }
+map hq10 "Headquarters 10" { next = "hq10" cluster = 10 NoAutosaveHint }

@@ -6,5 +6,5 @@ set -e
 filename=headquarters.pk3
 
 rm -f $filename
-zip -R $filename "*.md" "*.txt" "*.zs"
+zip -R $filename "*.md" "*.txt" "*.zs" "*.wad"
 gzdoom "$@" -file $filename

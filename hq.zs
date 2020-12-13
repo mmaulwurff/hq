@@ -196,16 +196,14 @@ class hq_EventHandler : EventHandler
   private static
   bool isHq()
   {
-    return level.mapname ~== HQ_MAP_NAME;
+    return level.mapname ~== getHqMap();
   }
 
   private static
   string getHqMap()
   {
-    return HQ_MAP_NAME;
+    return string.format("hq%d", level.cluster);
   }
-
-  const HQ_MAP_NAME = "test";
 
   const HQ_CHANGELEVEL_FLAGS = CHANGELEVEL_NOINTERMISSION | CHANGELEVEL_PRERAISEWEAPON;
 
