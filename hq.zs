@@ -103,9 +103,9 @@ class hq_EventHandler : EventHandler
   void restorePlayerPosition(int playerNumber, string positionString)
   {
     let positionDict = Dictionary.fromString(positionString);
-    double x = positionDict.at("x").toDouble();
-    double y = positionDict.at("y").toDouble();
-    double z = positionDict.at("z").toDouble();
+    double x     = positionDict.at("x"    ).toDouble();
+    double y     = positionDict.at("y"    ).toDouble();
+    double z     = positionDict.at("z"    ).toDouble();
     double angle = positionDict.at("angle").toDouble();
     Actor player = players[playerNumber].mo;
 
@@ -118,16 +118,16 @@ class hq_EventHandler : EventHandler
     if (isHq()) return;
 
     Actor player = player();
-    let positionDict = Dictionary.Create();
-    positionDict.insert("x", string.format("%f", player.pos.x));
-    positionDict.insert("y", string.format("%f", player.pos.y));
-    positionDict.insert("z", string.format("%f", player.pos.z));
+    let positionDict = Dictionary.create();
+    positionDict.insert("x",     string.format("%f", player.pos.x));
+    positionDict.insert("y",     string.format("%f", player.pos.y));
+    positionDict.insert("z",     string.format("%f", player.pos.z));
     positionDict.insert("angle", string.format("%f", player.angle));
 
     setPositionString(positionDict.toString());
     setBackmap(level.mapname);
 
-    level.changeLevel(HQ_MAP_NAME, 0, HQ_CHANGELEVEL_FLAGS);
+    level.changeLevel(getHqMap(), 0, HQ_CHANGELEVEL_FLAGS);
   }
 
   private
@@ -141,7 +141,7 @@ class hq_EventHandler : EventHandler
   private static
   string getPositionString()
   {
-    ThinkerIterator i = ThinkerIterator.create("hq_PositionStorage");
+    let i = ThinkerIterator.create("hq_PositionStorage");
     hq_PositionStorage positionStorage;
     while (positionStorage = hq_PositionStorage(i.next()))
     {
@@ -154,7 +154,7 @@ class hq_EventHandler : EventHandler
   private static
   void clearPositionString()
   {
-    ThinkerIterator i = ThinkerIterator.Create("hq_PositionStorage");
+    let i = ThinkerIterator.create("hq_PositionStorage");
     Actor positionStorage;
     while (positionStorage = Actor(i.next()))
     {
@@ -197,6 +197,12 @@ class hq_EventHandler : EventHandler
   bool isHq()
   {
     return level.mapname ~== HQ_MAP_NAME;
+  }
+
+  private static
+  string getHqMap()
+  {
+    return HQ_MAP_NAME;
   }
 
   const HQ_MAP_NAME = "test";
