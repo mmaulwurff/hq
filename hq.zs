@@ -61,7 +61,11 @@ class hq_EventHandler : EventHandler
   {
     if (isHq())
     {
-      level.nextmap = getBackmap();
+      string backmap = getBackmap();
+      if (backmap.length() != 0)
+      {
+        level.nextmap = backmap;
+      }
     }
     else
     {
@@ -139,7 +143,11 @@ class hq_EventHandler : EventHandler
   {
     if (!isHq()) return;
 
-    level.changeLevel(getBackmap(), 0, HQ_CHANGELEVEL_FLAGS);
+    string backmap = getBackmap();
+    if (backmap.length() != 0)
+    {
+      level.changeLevel(backmap, 0, HQ_CHANGELEVEL_FLAGS);
+    }
   }
 
   private static
@@ -175,7 +183,8 @@ class hq_EventHandler : EventHandler
   private static
   string getBackmap()
   {
-    return hq_BackmapStorage(player().findInventory("hq_BackmapStorage")).mBackmap;
+    let storage = hq_BackmapStorage(player().findInventory("hq_BackmapStorage"));
+    return storage ? storage.mBackmap : "";
   }
 
   private static
